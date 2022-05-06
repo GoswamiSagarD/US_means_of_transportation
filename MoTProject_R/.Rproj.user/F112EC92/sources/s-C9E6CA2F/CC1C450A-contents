@@ -1,0 +1,84 @@
+---
+title: "Europeon Countries Data"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Importing required Libraries
+
+library(tidyverse)
+
+# Importing and Cleaning Data
+
+df \<- read.csv(file = "00_historical_emissions.csv")
+
+df \<- df[-c(5)]
+
+names(df)[5] \<- "Quantity" df$Quantity <- as.numeric(df$Quantity)
+
+\#Filtering Data with CAIT as source dfCAIT \<- df %\>%
+filter(df\$Data.source == "CAIT")
+
+dfCAIT \<- dfCAIT[-c(2)]
+
+# Filtering CAIT Data with European Union as Countries
+
+EU \<- list("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus",
+"Czech Republic", "Denmark", "Estonia", "Finland", "France", "Germany",
+"Greece", "Hungary", "Ireland", "Italy", "Latvia", "Lithuania",
+"Luxenmbourg", "Malta", "Netherlands", "Poland", "Portugal", "Romania",
+"Slovakia", "Slovenia", "Spain", "Sweden")
+
+dfCAIT_EU \<- dfCAIT[dfCAIT\$Country %in% EU,]
+
+dfCAIT_EU2 \<- dfCAIT_EU[dfCAIT_EU\$Gas != "All GHG",]
+
+countryemissions \<- dfCAIT_EU[dfCAIT_EU\$Gas != "All GHG",] %\>%
+select(Country, Quantity) %\>% group_by(Country) %\>%
+summarise(Emissions = sum(Quantity, na.rm = TRUE))
+
+top10Country \<- countryemissions %\>% slice_max(Emissions, n = 5)
+
+dfCAIT_EU2 \<- dfCAIT_EU2[dfCAIT_EU2$Country %in% top10Country$Country,]
+
+# Stacked Bar Plot
+
+ggplot (data = dfCAIT_EU2, mapping = aes(x= Sector, y = Quantity, fill =
+Country) ) + geom_bar(stat = "identity", color = "white") + coord_flip()
++ facet_wrap(\~Gas, ncol = 1, scales = "free_x") + labs(title =
+"Sector-wise Emissions (Europeon Countries)", x = "Sectors", y =
+"Emissions (metric. tonnes in millions)")
+
+# EU Map Plot
+
+mapdata \<- map_data("world") names(mapdata)[5] \<- "Country"
+
+dfCAIT$Country[dfCAIT$Country == "Côte d'Ivoire"] \<- "Ivory Coast"
+dfCAIT$Country[dfCAIT$Country == "United States"] \<- "USA"
+dfCAIT$Country[dfCAIT$Country == "United Kingdom"] \<- "UK"
+dfCAIT$Country[dfCAIT$Country == "Trinidad and Tobago"] \<- "Trinidad"
+dfCAIT$Country[dfCAIT$Country == "Macedonia"] \<- "North Macedonia"
+dfCAIT$Country[dfCAIT$Country == "Eswatini"] \<- "Swaziland"
+mapdata$Country[mapdata$Country == "Antigua"] \<- "Antigua and Barbuda"
+mapdata$Country[mapdata$Country == "Saint Kitts"] \<- "Saint Kitts and
+Nevis" mapdata$Country[mapdata$Country == "Nevis"] \<- "Saint Kitts and
+Nevis" mapdata$Country[mapdata$Country == "Saint Vincent"] \<- "Saint
+Vincent and the Grenadines" mapdata$Country[mapdata$Country ==
+"Grenadines"] \<- "Saint Vincent and the Grenadines"
+
+a \<- left_join(mapdata, dfCAIT_EU, by="Country") a \<- a %\>%
+filter(!is.na(a$Quantity)) a <- a %>% filter(a$Gas == "All GHG")
+
+map1\<-ggplot(a, aes( x = long, y = lat, group=group)) +
+geom_polygon(aes(fill = Quantity), color = "black") +
+
+labs(title="Europeon Union Gas Emissions (2018)", subtitle='Proportional
+Shares of Countries to Total Greenhouse Gas Emissions', caption=c('Data
+Source: wri.org')) +
+
+\#scale_fill_distiller(palette = "RdYlGn") \# scale_fill_gradient(low =
+"\#ffeda0", high = "\#f03b20") scale_fill_viridis_c(option = "rocket")
+
+map1

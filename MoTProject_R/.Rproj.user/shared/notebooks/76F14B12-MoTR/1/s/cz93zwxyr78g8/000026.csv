@@ -1,0 +1,4 @@
+"0","df1 <- filter(ACSCounty, Year == 2019)"
+"0","df1$region = df1$GEO_ID"
+"0","df1$value = df1$Estimate..Total..Public.transportation..excluding.taxicab."
+"0","df1"

@@ -1,0 +1,2 @@
+"0","df2State = slice(df2, 15:66)"
+"0","df2State$region = tolower(df2State$NAME)"

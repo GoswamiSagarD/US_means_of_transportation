@@ -1,0 +1,10 @@
+"0","df3 <- get_acs("
+"0","        geography = ""state"","
+"0","        variables = c("
+"0","            total = ""B08141_001E"","
+"0","            carpool0 = ""B08141_012E"""
+"0","            carpool1 = ""B08141_013E"""
+"2","Error: unexpected symbol in:
+""            carpool0 = ""B08141_012E""
+            carpool1""
+"

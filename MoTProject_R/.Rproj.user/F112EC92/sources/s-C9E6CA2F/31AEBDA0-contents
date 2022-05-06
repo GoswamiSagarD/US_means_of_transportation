@@ -1,0 +1,51 @@
+---
+html_document:
+  df_print: paged
+  fig.align: center
+  fig_width: 200
+  fig_height: 600
+author: "Jaswanth Kumar Kunku, Mehrdad Ghyabi, Sagar Goswami"
+date: "10/18/2021"
+title: "STAT-515 Group 5 Mid-Term Project"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Initiation
+
+## File Path
+
+```{r}
+path <- "C:/Users/sgoswam/Desktop/STATMidProject"
+setwd(path)
+```
+
+## Importing required Packages
+
+```{r}
+library(tidyverse)
+```
+
+## Importing the Database
+
+```{r}
+db <- read.csv("00_historical_emissions.csv")
+db_source <- read.csv("00_sources.csv")
+
+db_CAIT <- filter(db, )
+```
+
+# Visualizations
+
+```{r}
+ggplot (data = db, mapping = aes(x= Sector, y = X2018, fill = Country) ) +
+
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme(legend.position = "none") +
+  labs(title = "Country-wise Emissions",
+       x = "Countries",
+       y = "Emissions (metric. tonnes in millions)")
+```

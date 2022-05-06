@@ -1,0 +1,233 @@
+---
+title: "MoT_Visualization"
+author: "Sagar Goswami"
+date: "12/5/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Initiation
+
+## Importing Required Libraries
+
+```{r message=FALSE, warning=FALSE}
+#library(choroplethr)
+library(tidyverse)
+library(tidycensus)
+```
+
+## Importing Cleaned ACS Data
+
+### ACS County Data
+
+```{r}
+ACSCounty <- read.csv("C:/Users/sgoswam/Desktop/MoT Project/Clean_Data/ACSCountyCleaned.csv")
+```
+
+```{r}
+df1 <- filter(ACSCounty, Year == 2019)
+df1$region = df1$GEO_ID
+df1$value = df1$Estimate..Total..Public.transportation..excluding.taxicab.
+df1
+```
+
+### ACS State Data
+
+```{r}
+ACS <- read.csv("C:/Users/sgoswam/Desktop/MoT Project/Clean_Data/ACSCleaned.csv")
+df2 <- filter(ACS, Year == 2019)
+```
+
+# Analyzing Data at State Level
+
+## Fetching Map Shape Files
+
+```{r}
+df2State = slice(df2, 15:66)
+df2State$region = tolower(df2State$NAME)
+```
+
+```{r}
+mapdata <- map_data("state")
+```
+
+```{r}
+mapdata <- left_join(mapdata, df2State, by = "region")
+```
+
+## Visualizing Data
+
+```{r}
+map1 <- ggplot(data = mapdata,
+               aes(x = long, y = lat, group = group)) +
+        geom_polygon(aes(fill = Estimate..Total..Public.transportation..excluding.taxicab.),
+                     color = "black") +
+        coord_map("bonne", lat0 = 50) +
+        labs(title = "Public Transportation in US",
+            subtitle="Total No of People commuting by Public Transportation",
+            caption=c('Data Source: American Census Survey 2019,\nUS Census Beureau')) +
+        scale_fill_distiller(name = "Total No of People\ncommuting by\nPublic Transportation", palette = "RdYlGn", direction = 1) +
+        theme_void()
+map1
+```
+
+```{r}
+map2 <- ggplot(data = mapdata,
+               aes(x = long, y = lat, group = group)) +
+        geom_polygon(aes(fill = Estimate..Total..Public.transportation..excluding.taxicab./Estimate..Total*100),
+                     color = "black") +
+        coord_map("bonne", lat0 = 50) +
+        labs(title = "Public Transportation in US",
+            subtitle="Proportion of People commuting by Public Transportation",
+            caption=c('Data Source: American Census Survey 2019,\nUS Census Beureau')) +
+        scale_fill_distiller(name = "% of People commuting\nby Public Transportation", palette = "RdYlGn", direction = 1) +
+        theme_void()
+map2
+```
+
+```{r}
+mapdata$noncar <- mapdata$Estimate..Total..Car..truck..or.van..Carpooled +
+                    mapdata$Estimate..Total..Public.transportation..excluding.taxicab. +
+                    mapdata$Estimate..Total..Motorcycle +
+                    mapdata$Estimate..Total..Bicycle +
+                    mapdata$Estimate..Total..Walked +
+                    mapdata$Estimate..Total..Other.means +
+                    mapdata$Estimate..Total..Worked.at.home
+mapdata$noncar <- mapdata$noncar / mapdata$Estimate..Total * 100
+```
+
+```{r}
+map3 <- ggplot(data = mapdata,
+               aes(x = long, y = lat, group = group)) +
+        geom_polygon(aes(fill = noncar),
+                     color = "black") +
+        coord_map("bonne", lat0 = 50) +
+        labs(title = "Public Transportation in US",
+            subtitle="Proportion of People not commuting alone by Car/Truck/Van/Taxi/Cab",
+            caption=c('Data Source: American Census Survey 2019,\nUS Census Beureau')) +
+        scale_fill_distiller(name = "% of People commuting by \nCarpooling, Public Transport, Motorcycle, \nBicycle, Wakling, Other means, Worked form Home",
+                             palette = "RdYlGn", direction = 1) +
+        theme_void()
+map3
+```
+
+# Analyzing No of Vehicles and Public Transportation Data at State Level
+
+## Fetching No of Vehicles Data
+
+```{r}
+df3 <- get_acs(
+        geography = "state",
+        variables = c(
+            total = "B08141_001E",
+            carpool0 = "B08141_012E",
+            carpool1 = "B08141_013E",
+            carpool2 = "B08141_014E",
+            carpool3p = "B08141_015E",
+            pubtrans0 = "B08141_017E",
+            pubtrans1 = "B08141_018E",
+            pubtrans2 = "B08141_019E",
+            pubtrans3p = "B08141_020E",
+            walked0 = "B08141_022E",
+            walked1 = "B08141_023E",
+            walked2 = "B08141_024E",
+            walked3p = "B08141_025E",
+            other0 = "B08141_027E",
+            other1 = "B08141_028E",
+            other2 = "B08141_029E",
+            other3p = "B08141_030E",
+            workfh0 = "B08141_032E",
+            workfh1 = "B08141_033E",
+            workfh2 = "B08141_034E",
+            workfh3p = "B08141_035E"),
+        geometry = TRUE)
+```
+
+```{r}
+df3
+```
+
+```{r}
+plot(df3['estimate'])
+```
+
+```{r}
+pop[1]
+```
+
+```{r}
+get_estimates(geography = "state",
+               variables = c(
+            total = "B08141_001E",
+            carpool0 = "B08141_012E",
+            carpool1 = "B08141_013E",
+            carpool2 = "B08141_014E",
+            carpool3p = "B08141_015E",
+            pubtrans0 = "B08141_017E",
+            pubtrans1 = "B08141_018E",
+            pubtrans2 = "B08141_019E",
+            pubtrans3p = "B08141_020E",
+            walked0 = "B08141_022E",
+            walked1 = "B08141_023E",
+            walked2 = "B08141_024E",
+            walked3p = "B08141_025E",
+            other0 = "B08141_027E",
+            other1 = "B08141_028E",
+            other2 = "B08141_029E",
+            other3p = "B08141_030E",
+            workfh0 = "B08141_032E",
+            workfh1 = "B08141_033E",
+            workfh2 = "B08141_034E",
+            workfh3p = "B08141_035E"))
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+# Analyzing Population and Public Transportation Data at State Level
+
+## Fetching Population Data
+
+```{r}
+library(tidycensus)
+```
+
+```{r}
+pop <- get_acs(geography = "state",
+                variables= "B01003_001E",
+                geometry = TRUE)
+```
+
+```{r}
+
+```
+
+```{r}
+plot(pop['estimate'])
+```
+
+```{r}
+map4 <- ggplot(data = pop, aes(fill = estimate)) +
+        geom_sf()
+map4
+```
+
+```{r}
+get_state_demographics(endyear = 2019, span = 1)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

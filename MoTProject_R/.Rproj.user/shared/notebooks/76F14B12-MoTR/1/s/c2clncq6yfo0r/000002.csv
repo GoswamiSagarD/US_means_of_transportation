@@ -1,0 +1,8 @@
+"0","mapdata$noncar <- mapdata$Estimate..Total..Car..truck..or.van..Carpooled +"
+"0","                    mapdata$Estimate..Total..Public.transportation..excluding.taxicab. +"
+"0","                    mapdata$Estimate..Total..Motorcycle +"
+"0","                    mapdata$Estimate..Total..Bicycle +"
+"0","                    mapdata$Estimate..Total..Walked +"
+"0","                    mapdata$Estimate..Total..Other.means +"
+"0","                    mapdata$Estimate..Total..Worked.at.home"
+"0","mapdata$noncar <- mapdata$noncar / mapdata$Estimate..Total * 100"
